@@ -8,6 +8,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Ping godoc
+// @Summary Health check
+// @Description Returns a basic pong message
+// @Tags System
+// @Accept json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /ping [get]
 func (controller *Controller) Ping(c *fiber.Ctx) error {
 	params := &service.PingParams{}
 

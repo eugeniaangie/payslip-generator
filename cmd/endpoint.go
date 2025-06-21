@@ -4,10 +4,15 @@ import (
 	"payslip-generator/controller"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/swaggo/fiber-swagger"
 )
 
 func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.App {
-	app.Get("/ping", controller.Ping)
+	// Add Swagger handler
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
+	api := app.Group("/api")
+	api.Get("/ping", controller.Ping)
 
 	return app
 }

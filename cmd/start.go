@@ -14,14 +14,27 @@ import (
 	"payslip-generator/util/config"
 	"payslip-generator/util/errs"
 
-	_ "github.com/lib/pq"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
+	"payslip-generator/docs"
 )
 
+// @title Payslip Generator API
+// @version 1.0
+// @description REST API for attendance, overtime, and payroll processing.
+// @host localhost:4000
+// @BasePath /api
+// @schemes http
 func start() {
 	const op errs.Op = "main/start"
+	docs.SwaggerInfo.Title = "Payslip Generator API"
+	docs.SwaggerInfo.Description = "API for attendance, overtime, reimbursement, and payroll"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = fmt.Sprintf("localhost:%d", 4000)
+	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.Schemes = []string{"http"}
 
 	// init logger
 	var logger = logrus.New()
@@ -68,13 +81,11 @@ func start() {
 
 	logger.Info("Postgres store created ...")
 
-	
 	// init service layer
 	service := service.NewService(
 		logger,
 		postgresStore,
 	)
-
 
 	// init presentation layer
 	controller := controller.NewController(config.App.Timeout, service)
