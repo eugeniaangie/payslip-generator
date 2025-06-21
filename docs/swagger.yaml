@@ -1,3 +1,19 @@
+definitions:
+  controller.CreateUserRequest:
+    properties:
+      full_name:
+        example: John Doe
+        type: string
+      password_hash:
+        example: $2a$10$hashedpassword
+        type: string
+      user_role:
+        example: employee
+        type: string
+      username:
+        example: john_doe
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -17,4 +33,51 @@ paths:
       summary: Health check
       tags:
       - System
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Get user list
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of users per page
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get user list
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create user
+      tags:
+      - User
 swagger: "2.0"

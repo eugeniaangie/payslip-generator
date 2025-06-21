@@ -13,6 +13,8 @@ func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.A
 
 	api := app.Group("/api")
 	api.Get("/ping", controller.Ping)
+	api.Post("/user", controller.CreateUser)
+	api.Get("/user", controller.GetUserList)
 
 	return app
 }
