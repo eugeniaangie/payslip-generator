@@ -1,0 +1,13 @@
+{
+  "app": {
+    "name": "payslip-generator",
+    "port": 4000,
+    "timeout": "30s"
+  },
+  "store": {
+    "postgres": {
+      "driver": "postgres",
+      "dsn": "postgres://payslip_user:password123@localhost:5432/payslip?sslmode=disable"
+    }
+  }
+}
