@@ -1,22 +1,186 @@
 definitions:
-  controller.CreateUserRequest:
+  controller.CreateAttendancePeriodRequest:
     properties:
-      full_name:
-        example: John Doe
+      created_by:
+        example: 5407e21d-bee4-422e-9158-ed705347648b
         type: string
-      password_hash:
-        example: $2a$10$hashedpassword
+      end_date:
+        example: "2025-01-31"
         type: string
-      user_role:
-        example: employee
+      start_date:
+        example: "2025-01-01"
+        type: string
+      updated_by:
+        example: 5407e21d-bee4-422e-9158-ed705347648b
+        type: string
+    type: object
+  controller.LoginRequest:
+    properties:
+      password:
         type: string
       username:
-        example: john_doe
+        type: string
+    type: object
+  controller.RegisterRequest:
+    properties:
+      full_name:
+        type: string
+      password:
+        type: string
+      user_role:
+        type: string
+      username:
         type: string
     type: object
 info:
   contact: {}
 paths:
+  /admin/attendance_period:
+    get:
+      consumes:
+      - application/json
+      description: Get attendance period list
+      parameters:
+      - description: Start date
+        in: query
+        name: start_date
+        type: string
+      - description: End date
+        in: query
+        name: end_date
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of attendance periods per page
+        in: query
+        name: page_size
+        type: integer
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get attendance period list
+      tags:
+      - Attendance Period
+    post:
+      consumes:
+      - application/json
+      description: Only admin can create an attendance period by providing start and
+        end dates
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Attendance Period Payload
+        in: body
+        name: attendance_period
+        required: true
+        schema:
+          $ref: '#/definitions/controller.CreateAttendancePeriodRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new attendance period
+      tags:
+      - Attendance Period
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/controller.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login a user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - Auth
   /ping:
     get:
       consumes:
@@ -33,51 +197,4 @@ paths:
       summary: Health check
       tags:
       - System
-  /user:
-    get:
-      consumes:
-      - application/json
-      description: Get user list
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Number of users per page
-        in: query
-        name: page_size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Get user list
-      tags:
-      - User
-    post:
-      consumes:
-      - application/json
-      description: Create user
-      parameters:
-      - description: User
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/controller.CreateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Create user
-      tags:
-      - User
 swagger: "2.0"

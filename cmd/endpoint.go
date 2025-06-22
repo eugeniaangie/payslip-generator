@@ -21,9 +21,10 @@ func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.A
 
 	apiAdmin := api.Group("/admin")
 	apiAdmin.Use(middleware.AuthMiddleware(), middleware.AdminOnly())
-	
+	apiAdmin.Post("/attendance_period", controller.CreateAttendancePeriod)
+	apiAdmin.Get("/attendance_period", controller.GetAttendancePeriodList)
+
 	apiEmployee := api.Group("/")
 	apiEmployee.Use(middleware.AuthMiddleware())
-	
 	return app
 }
