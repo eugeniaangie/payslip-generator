@@ -26,5 +26,7 @@ func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.A
 
 	apiEmployee := api.Group("/")
 	apiEmployee.Use(middleware.AuthMiddleware())
+	apiEmployee.Post("/attendance", controller.CreateAttendance)
+
 	return app
 }

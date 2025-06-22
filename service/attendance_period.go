@@ -25,6 +25,11 @@ type CreateAttendancePeriodResult struct {
 
 func (service *Service) CreateAttendancePeriod(ctx context.Context, param *CreateAttendancePeriodParam) (*CreateAttendancePeriodResult, error) {
 	const op errs.Op = "service/CreateAttendancePeriod"
+	
+	service.logger.WithFields(logrus.Fields{
+		"op":    op,
+		"param": fmt.Sprintf("%+v", param),
+	}).Debug()
 
 	serviceResult := &CreateAttendancePeriodResult{}
 

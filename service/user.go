@@ -15,13 +15,18 @@ type GetUserByUsernameParam struct {
 }
 
 type GetUserByUsernameResult struct {
-	StatusCode    string     `json:"status_code"`
-	StatusMessage string     `json:"status_msg"`
-	Data          model.User `json:"data"`
+	StatusCode    string      `json:"status_code"`
+	StatusMessage string      `json:"status_msg"`
+	Data          interface{} `json:"data"`
 }
 
 func (service *Service) GetUserByUsername(ctx context.Context, param *GetUserByUsernameParam) (*GetUserByUsernameResult, error) {
 	const op errs.Op = "service/GetUserByUsername"
+
+	service.logger.WithFields(logrus.Fields{
+		"op":    op,
+		"param": fmt.Sprintf("%+v", param),
+	}).Debug()
 
 	serviceResult := &GetUserByUsernameResult{}
 
@@ -31,7 +36,7 @@ func (service *Service) GetUserByUsername(ctx context.Context, param *GetUserByU
 		if err.Error() == "sql: no rows in result set" {
 			serviceResult.StatusCode = errs.CODE_SUCCESS
 			serviceResult.StatusMessage = "user not found"
-			serviceResult.Data = model.User{} // Empty user
+			serviceResult.Data = map[string]interface{}{} // Empty user
 			return serviceResult, nil
 		}
 
@@ -68,6 +73,11 @@ type CreateUserResult struct {
 
 func (service *Service) CreateUser(ctx context.Context, param *CreateUserParam) (*CreateUserResult, error) {
 	const op errs.Op = "service/CreateUser"
+
+	service.logger.WithFields(logrus.Fields{
+		"op":    op,
+		"param": fmt.Sprintf("%+v", param),
+	}).Debug()
 
 	serviceResult := &CreateUserResult{}
 

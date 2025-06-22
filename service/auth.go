@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"payslip-generator/store/postgres_store"
 	"payslip-generator/util/auth"
@@ -13,15 +14,21 @@ import (
 )
 
 type RegisterParam struct {
-	FullName     string `json:"full_name"`
-	Username     string `json:"username"`
-	Password     string `json:"password"`
-	UserRole     string `json:"user_role"`
+	FullName string `json:"full_name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	UserRole string `json:"user_role"`
 }
 
 // Register creates a new user.
 func (service *Service) Register(ctx context.Context, param *RegisterParam) (*CreateUserResult, error) {
 	const op errs.Op = "service/Register"
+
+	service.logger.WithFields(logrus.Fields{
+		"op":    op,
+		"param": fmt.Sprintf("%+v", param),
+	}).Debug()
+
 	serviceResult := &CreateUserResult{}
 
 	usernameExist, err := service.GetUserByUsername(ctx, &GetUserByUsernameParam{
@@ -39,7 +46,7 @@ func (service *Service) Register(ctx context.Context, param *RegisterParam) (*Cr
 		return serviceResult, err
 	}
 
-	if usernameExist.Data.ID != "" {
+	if usernameExist.Data != nil {
 		serviceResult.StatusCode = errs.CODE_ERR_VALIDATION
 		serviceResult.StatusMessage = "username already exists"
 		return serviceResult, errors.New("username already exists")
@@ -85,6 +92,13 @@ type LoginParam struct {
 
 // Login authenticates the user and returns a JWT token.
 func (service *Service) Login(ctx context.Context, param *LoginParam) (string, error) {
+	const op errs.Op = "service/Login"
+
+	service.logger.WithFields(logrus.Fields{
+		"op":    op,
+		"param": fmt.Sprintf("%+v", param),
+	}).Debug()
+
 	user, err := service.store.postgres.GetUserByUsername(ctx, param.Username)
 	if err != nil {
 		return "", errors.New("user not found")
