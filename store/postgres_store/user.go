@@ -10,6 +10,24 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func (store *Store) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
+	const op errs.Op = "postgres_store/GetUserByUsername"
+
+	var user model.User
+
+	err := store.Db.GetContext(ctx, &user, `SELECT * FROM users WHERE username = $1`, username)
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "QueryRowxContext",
+			"err":   err.Error(),
+		}).Error()
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 type CreateUserParam struct {
 	Username     string
 	PasswordHash string
@@ -122,12 +140,6 @@ func (store *Store) GetUserList(ctx context.Context, param *GetUserListParam) (*
 		}).Error()
 		return nil, err
 	}
-
-	store.logger.WithFields(logrus.Fields{
-		"search":      param.Search,
-		"final_query": query,
-		"params":      queryParams,
-	}).Info("Executing GetUserList")
 
 	hasNext := param.Page < totalPages
 

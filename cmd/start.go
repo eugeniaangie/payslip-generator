@@ -11,16 +11,21 @@ import (
 	"payslip-generator/controller"
 	"payslip-generator/service"
 	"payslip-generator/store/postgres_store"
+	"payslip-generator/util/auth"
 	"payslip-generator/util/config"
 	"payslip-generator/util/errs"
+
+	"payslip-generator/docs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
-	"payslip-generator/docs"
 )
 
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 // @title Payslip Generator API
 // @version 1.0
 // @description REST API for attendance, overtime, and payroll processing.
@@ -46,6 +51,24 @@ func start() {
 	logger.Out = os.Stdout
 
 	logger.Info("Loading config ...")
+	config.LoadEnv()
+
+	appConfig, err := config.LoadConfig(".")
+	if err != nil {
+		logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "LoadConfig",
+			"err":   err.Error(),
+		}).Error()
+		os.Exit(1)
+	}
+
+	auth.SetJWTKey([]byte(config.GetJWTSecret()))
+
+	logger.WithFields(logrus.Fields{
+		"op":     op,
+		"config": fmt.Sprintf("%+v", appConfig),
+	}).Infof("Starting %s service ...", appConfig.App.Name)
 
 	// load environment variables from .env file
 	config, err := config.LoadConfig(".")

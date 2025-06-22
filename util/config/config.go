@@ -2,7 +2,9 @@ package config
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -11,6 +13,13 @@ import (
 type Config struct {
 	App   App   `mapstructure:"app"`
 	Store Store `mapstructure:"store"`
+}
+
+func LoadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("⚠️  No .env file found, relying on system environment variables")
+	}
 }
 
 // LoadConfig reads configuration from file or environment variables.
@@ -33,4 +42,9 @@ func LoadConfig(path string) (config Config, err error) {
 	}
 
 	return
+}
+
+// GetJWTSecret returns JWT_SECRET from env
+func GetJWTSecret() string {
+	return viper.GetString("JWT_SECRET")
 }

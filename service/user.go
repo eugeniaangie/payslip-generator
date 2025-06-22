@@ -10,6 +10,49 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type GetUserByUsernameParam struct {
+	Username string `json:"username"`
+}
+
+type GetUserByUsernameResult struct {
+	StatusCode    string     `json:"status_code"`
+	StatusMessage string     `json:"status_msg"`
+	Data          model.User `json:"data"`
+}
+
+func (service *Service) GetUserByUsername(ctx context.Context, param *GetUserByUsernameParam) (*GetUserByUsernameResult, error) {
+	const op errs.Op = "service/GetUserByUsername"
+
+	serviceResult := &GetUserByUsernameResult{}
+
+	storeResult, err := service.store.postgres.GetUserByUsername(ctx, param.Username)
+	if err != nil {
+		// Check if it's a "no rows" error
+		if err.Error() == "sql: no rows in result set" {
+			serviceResult.StatusCode = errs.CODE_SUCCESS
+			serviceResult.StatusMessage = "user not found"
+			serviceResult.Data = model.User{} // Empty user
+			return serviceResult, nil
+		}
+
+		service.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "GetUserByUsername",
+			"err":   err.Error(),
+		}).Error()
+
+		serviceResult.StatusCode = errs.CODE_ERR_DATABASE
+		serviceResult.StatusMessage = "failed to get user by username"
+		return serviceResult, err
+	}
+
+	serviceResult.StatusCode = errs.CODE_SUCCESS
+	serviceResult.StatusMessage = "ok"
+	serviceResult.Data = *storeResult
+
+	return serviceResult, nil
+}
+
 type CreateUserParam struct {
 	Username     string `json:"username"`
 	PasswordHash string `json:"password_hash"`
