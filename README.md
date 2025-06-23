@@ -43,8 +43,8 @@ This system allows employees to submit attendance, overtime, and reimbursements,
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/euegniaangie/payslip.git
-cd payslip
+git clone https://github.com/euegniaangie/payslip-generator.git
+cd payslip-generator
 ```
 
 ### 2. Setup PostgreSQL
