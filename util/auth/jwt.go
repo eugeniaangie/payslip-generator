@@ -16,12 +16,12 @@ func SetJWTKey(key []byte) {
 }
 
 // GenerateJWT creates a signed JWT token containing user_id and username.
-// Expiration is set to 24 hours.
+// Expiration is set to 2 hours.
 func GenerateJWT(userID, username string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id":  userID,
 		"username": username,
-		"exp":      time.Now().Add(24 * time.Hour).Unix(),
+		"exp":      time.Now().Add(2 * time.Hour).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)

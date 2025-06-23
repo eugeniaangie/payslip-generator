@@ -1,11 +1,14 @@
 package middleware
 
 import (
+	"payslip-generator/model"
+	"payslip-generator/service"
 	"payslip-generator/util/auth"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
 	"payslip-generator/util/errs"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func AuthMiddleware() fiber.Handler {
@@ -46,10 +49,21 @@ func AuthMiddleware() fiber.Handler {
 	}
 }
 
-func AdminOnly() fiber.Handler {
+func AdminOnly(service *service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		username := c.Locals("username")
-		if username != "admin" {
+		userResult, err := service.GetUserByUsername(c.Context(), username.(string))
+		
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"status_code":    errs.CODE_ERR_IO,
+				"status_message": "failed to get user by username",
+				"remark":         "failed to get user by username",
+			})
+		}
+
+		userRole := userResult.Data.(model.User).UserRole
+		if userRole != "admin" {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"status_code":    errs.CODE_ERR_UNAUTHORIZED,
 				"status_message": "Admin only",

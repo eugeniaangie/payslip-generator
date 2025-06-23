@@ -77,6 +77,7 @@ type GetUserListParam struct {
 	Search   string
 	Page     int64
 	PageSize int64
+	UserRole string
 }
 
 type GetUserListResult struct {
@@ -98,6 +99,12 @@ func (store *Store) GetUserList(ctx context.Context, param *GetUserListParam) (*
 	if param.Search != "" {
 		query += fmt.Sprintf(" AND full_name ILIKE $%d", paramIdx)
 		queryParams = append(queryParams, fmt.Sprintf("%%%s%%", param.Search))
+		paramIdx++
+	}
+
+	if param.UserRole != "" {
+		query += fmt.Sprintf(" AND user_role = $%d", paramIdx)
+		queryParams = append(queryParams, param.UserRole)
 		paramIdx++
 	}
 

@@ -16,3 +16,23 @@ type Payslip struct {
 	CreatedAt     string `db:"created_at" json:"created_at"`
 	UpdatedAt     string `db:"updated_at" json:"updated_at"`
 }
+
+type PayslipSummaryItem struct {
+	EmployeeID       string `db:"employee_id" json:"employee_id"`
+	EmployeeName     string `db:"employee_name" json:"employee_name"`
+	TakeHomePay      int    `db:"take_home_pay" json:"take_home_pay"`
+	PresentDays      int    `db:"present_days" json:"present_days"`
+	WorkingDays      int    `db:"working_days" json:"working_days"`
+	OvertimeHours    int    `db:"overtime_hours" json:"overtime_hours"`
+	Reimbursement    int    `db:"reimbursement" json:"reimbursement"`
+	PeriodStartDate  string `db:"start_date" json:"-"`
+	PeriodEndDate    string `db:"end_date" json:"-"`
+	TotalTakeHomePay int    `db:"total_take_home_pay" json:"-"`
+}
+
+type PayslipSummary struct {
+	PeriodStartDate  string               `json:"period_start_date"`
+	PeriodEndDate    string               `json:"period_end_date"`
+	Items            []PayslipSummaryItem `json:"items"`
+	TotalTakeHomePay int                  `json:"total_take_home_pay"`
+}

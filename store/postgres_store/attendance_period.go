@@ -3,6 +3,7 @@ package postgres_store
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"payslip-generator/model"
 	"payslip-generator/util/errs"
@@ -58,8 +59,8 @@ func (store *Store) CreateAttendancePeriod(ctx context.Context, param *CreateAtt
 type GetAttendancePeriodListParam struct {
 	StartDate string
 	EndDate   string
-	Page     int64
-	PageSize int64
+	Page      int64
+	PageSize  int64
 }
 
 type GetAttendancePeriodListResult struct {
@@ -147,7 +148,6 @@ func (store *Store) GetAttendancePeriodList(ctx context.Context, param *GetAtten
 	return result, nil
 }
 
-
 type GetAttendancePeriodByIDParam struct {
 	ID string
 }
@@ -167,7 +167,8 @@ func (store *Store) GetAttendancePeriodByID(ctx context.Context, param *GetAtten
 		created_by, 
 		updated_by, 
 		created_at, 
-		updated_at 
+		updated_at,
+		is_payroll_processed
 		FROM attendance_period
 		WHERE id = $1
 	`
@@ -185,6 +186,52 @@ func (store *Store) GetAttendancePeriodByID(ctx context.Context, param *GetAtten
 	}
 
 	result := &GetAttendancePeriodByIDResult{
+		Data: attendancePeriod,
+	}
+
+	return result, nil
+}
+
+type UpdatePayrollAttendancePeriodParam struct {
+	ID                 string
+	IsPayrollProcessed bool
+	UpdatedBy          string
+	UpdatedAt          time.Time
+}
+
+type UpdatePayrollAttendancePeriodResult struct {
+	Data model.AttendancePeriod
+}
+
+func (store *Store) UpdatePayrollAttendancePeriod(ctx context.Context, param *UpdatePayrollAttendancePeriodParam) (*UpdatePayrollAttendancePeriodResult, error) {
+	const op errs.Op = "postgres_store/UpdatePayrollAttendancePeriod"
+
+	query := `
+		UPDATE attendance_period
+		SET is_payroll_processed = $1, updated_by = $2, updated_at = $3
+		WHERE id = $4
+		RETURNING id, start_date, end_date, created_by, updated_by, created_at, updated_at, is_payroll_processed
+	`
+
+	var attendancePeriod model.AttendancePeriod
+
+	err := store.Db.QueryRowxContext(ctx, query,
+		param.IsPayrollProcessed,
+		param.UpdatedBy,
+		param.UpdatedAt,
+		param.ID,
+	).StructScan(&attendancePeriod)
+
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "QueryRowxContext",
+			"err":   err.Error(),
+		}).Error()
+		return nil, err
+	}
+
+	result := &UpdatePayrollAttendancePeriodResult{
 		Data: attendancePeriod,
 	}
 

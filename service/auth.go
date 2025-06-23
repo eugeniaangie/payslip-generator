@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"payslip-generator/model"
 	"payslip-generator/store/postgres_store"
 	"payslip-generator/util/auth"
 	"payslip-generator/util/errs"
@@ -31,9 +32,7 @@ func (service *Service) Register(ctx context.Context, param *RegisterParam) (*Cr
 
 	serviceResult := &CreateUserResult{}
 
-	usernameExist, err := service.GetUserByUsername(ctx, &GetUserByUsernameParam{
-		Username: param.Username,
-	})
+	usernameExist, err := service.GetUserByUsername(ctx, param.Username)
 	if err != nil {
 		service.logger.WithFields(logrus.Fields{
 			"op":    op,
@@ -46,7 +45,9 @@ func (service *Service) Register(ctx context.Context, param *RegisterParam) (*Cr
 		return serviceResult, err
 	}
 
-	if usernameExist.Data != nil {
+	user, ok := usernameExist.Data.(model.User)
+	if ok && user.ID != "" {
+		// user exists
 		serviceResult.StatusCode = errs.CODE_ERR_VALIDATION
 		serviceResult.StatusMessage = "username already exists"
 		return serviceResult, errors.New("username already exists")

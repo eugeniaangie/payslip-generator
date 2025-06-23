@@ -62,6 +62,12 @@ definitions:
       username:
         type: string
     type: object
+  controller.RunPayrollRequest:
+    properties:
+      period_id:
+        example: 0370f6f0-5762-4bbe-a57c-b398c2c76dd2
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -111,6 +117,108 @@ paths:
       summary: Create a new attendance period
       tags:
       - Attendance Period
+  /admin/payroll:
+    post:
+      consumes:
+      - application/json
+      description: Admin can run payroll by providing period id
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Payroll Payload
+        in: body
+        name: payroll
+        required: true
+        schema:
+          $ref: '#/definitions/controller.RunPayrollRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Run payroll
+      tags:
+      - Payroll
+  /admin/payslip-summary:
+    get:
+      consumes:
+      - application/json
+      description: Get payslip summary
+      parameters:
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Start date
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date
+        in: query
+        name: end_date
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of attendance periods per page
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get payslip summary
+      tags:
+      - Payslip
   /admin/salary:
     post:
       consumes:

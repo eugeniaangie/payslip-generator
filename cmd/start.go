@@ -125,7 +125,7 @@ func start() {
 	app.Use(cors.New(corsConfig))
 
 	// endpoint definitions
-	app = defineEndpoints(app, controller)
+	app = defineEndpoints(app, controller, service)
 
 	// create a channel to signal when the server has stopped
 	serverError := make(chan error, 1)

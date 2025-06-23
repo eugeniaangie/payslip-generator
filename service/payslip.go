@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"payslip-generator/model"
 	"payslip-generator/store/postgres_store"
 	"payslip-generator/util/errs"
 	"time"
@@ -148,35 +149,143 @@ func (service *Service) CreatePayslip(ctx context.Context, param *CreatePayslipP
 
 	takeHomePay := int(salaryByAttendance + overtimePay + float64(totalReimbursement))
 
-	storeResult, err := service.store.postgres.CreatePayslip(ctx, &postgres_store.CreatePayslipParam{
-		UserID:        param.UserID,
-		PeriodID:      param.PeriodID,
+	payslipExist, err := service.store.postgres.GetPayslipByUserIDAndPeriodID(ctx, &postgres_store.GetPayslipByUserIDAndPeriodIDParam{
+		UserID:   param.UserID,
+		PeriodID: param.PeriodID,
+	})
+
+	if err != nil {
+		// If not found, create a new payslip
+		if err.Error() == "sql: no rows in result set" {
+			storeResult, err := service.store.postgres.CreatePayslip(ctx, &postgres_store.CreatePayslipParam{
+				UserID:        param.UserID,
+				PeriodID:      param.PeriodID,
+				BaseSalary:    salary.Data.Amount,
+				PresentDays:   attendanceDays,
+				WorkingDays:   workingDays,
+				OvertimeHours: overtimeHours,
+				Reimbursement: totalReimbursement,
+				TakeHomePay:   takeHomePay,
+				CreatedBy:     param.CreatedBy,
+				UpdatedBy:     param.UpdatedBy,
+				IpAddress:     param.IpAddress,
+			})
+			if err != nil {
+				service.logger.WithFields(logrus.Fields{
+					"op":    op,
+					"scope": "CreatePayslip",
+					"err":   err.Error(),
+				}).Error()
+
+				serviceResult.StatusCode = errs.CODE_ERR_DATABASE
+				serviceResult.StatusMessage = "failed to create payslip"
+				return serviceResult, err
+			}
+			serviceResult.StatusCode = errs.CODE_SUCCESS
+			serviceResult.StatusMessage = "ok"
+			serviceResult.Data = storeResult.Data
+			return serviceResult, nil
+		}
+
+		service.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "GetPayslipByUserIDAndPeriodID",
+			"err":   err.Error(),
+		}).Error()
+
+		serviceResult.StatusCode = errs.CODE_ERR_DATABASE
+		serviceResult.StatusMessage = "failed to get payslip"
+		return serviceResult, err
+	}
+
+	// If found, update the payslip
+	now := time.Now()
+	storeResult, err := service.store.postgres.UpdatePayslip(ctx, &postgres_store.UpdatePayslipParam{
+		ID:            payslipExist.Data.ID,
 		BaseSalary:    salary.Data.Amount,
 		PresentDays:   attendanceDays,
 		WorkingDays:   workingDays,
 		OvertimeHours: overtimeHours,
 		Reimbursement: totalReimbursement,
 		TakeHomePay:   takeHomePay,
-		CreatedBy:     param.CreatedBy,
 		UpdatedBy:     param.UpdatedBy,
+		UpdatedAt:     now,
 		IpAddress:     param.IpAddress,
 	})
 	if err != nil {
 		service.logger.WithFields(logrus.Fields{
 			"op":    op,
-			"scope": "CreatePayslip",
+			"scope": "UpdatePayslip",
 			"err":   err.Error(),
 		}).Error()
 
 		serviceResult.StatusCode = errs.CODE_ERR_DATABASE
-		serviceResult.StatusMessage = "failed to create payslip"
+		serviceResult.StatusMessage = "failed to update payslip"
+		return serviceResult, err
+	}
+	serviceResult.StatusCode = errs.CODE_SUCCESS
+	serviceResult.StatusMessage = "ok"
+	serviceResult.Data = storeResult.Data
+	return serviceResult, nil
+}
+
+type GetPayslipSummaryParam struct {
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
+	Page      int64  `json:"page"`
+	PageSize  int64  `json:"page_size"`
+}
+
+type GetPayslipSummaryResult struct {
+	StatusCode    string           `json:"status_code"`
+	StatusMessage string           `json:"status_msg"`
+	Data          interface{}      `json:"data"`
+	Pagination    model.Pagination `json:"pagination"`
+}
+
+func (service *Service) GetPayslipSummary(ctx context.Context, param *GetPayslipSummaryParam) (*GetPayslipSummaryResult, error) {
+	const op errs.Op = "service/GetPayslipSummary"
+
+	if param.Page <= 0 {
+		param.Page = model.DefaultPage
+	}
+	if param.PageSize <= 0 {
+		param.PageSize = model.DefaultPageSize
+	}
+	// Limit maximum page size
+	if param.PageSize > model.MaxPageSize {
+		param.PageSize = model.MaxPageSize
+	}
+
+	service.logger.WithFields(logrus.Fields{
+		"op":    op,
+		"param": fmt.Sprintf("%+v", param),
+	}).Debug()
+
+	serviceResult := &GetPayslipSummaryResult{}
+
+	storeResult, err := service.store.postgres.GetPayslipSummary(ctx, &postgres_store.GetPayslipSummaryParam{
+		StartDate: param.StartDate,
+		EndDate:   param.EndDate,
+		Page:      param.Page,
+		PageSize:  param.PageSize,
+	})
+	if err != nil {
+		service.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "GetPayslipSummary",
+			"err":   err.Error(),
+		}).Error()
+
+		serviceResult.StatusCode = errs.CODE_ERR_DATABASE
+		serviceResult.StatusMessage = "failed to get payslip summary"
 		return serviceResult, err
 	}
 
 	serviceResult.StatusCode = errs.CODE_SUCCESS
 	serviceResult.StatusMessage = "ok"
 	serviceResult.Data = storeResult.Data
-
+	serviceResult.Pagination = storeResult.Pagination
 	return serviceResult, nil
 }
 

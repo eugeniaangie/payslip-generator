@@ -1,14 +1,14 @@
 package main
 
 import (
+	"github.com/gofiber/fiber/v2"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"payslip-generator/controller"
 	"payslip-generator/middleware"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/swaggo/fiber-swagger"
+	"payslip-generator/service"
 )
 
-func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.App {
+func defineEndpoints(app *fiber.App, controller *controller.Controller, service *service.Service) *fiber.App {
 	// Add Swagger handler
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
@@ -20,11 +20,11 @@ func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.A
 	auth.Post("/register", controller.Register)
 
 	apiAdmin := api.Group("/admin")
-	apiAdmin.Use(middleware.AuthMiddleware(), middleware.AdminOnly())
+	apiAdmin.Use(middleware.AuthMiddleware(), middleware.AdminOnly(service))
 	apiAdmin.Post("/salary", controller.CreateSalary)
 	apiAdmin.Post("/attendance_period", controller.CreateAttendancePeriod)
-	// protected.Post("/run-payroll", controller.RunPayroll)
-	// protected.Get("/payslip-summary", controller.GetPayslipSummary)
+	apiAdmin.Post("/payroll", controller.RunPayroll)
+	apiAdmin.Get("/payslip-summary", controller.GetPayslipSummary)
 
 	apiEmployee := api.Group("/")
 	apiEmployee.Use(middleware.AuthMiddleware())

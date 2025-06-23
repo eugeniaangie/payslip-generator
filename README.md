@@ -57,6 +57,16 @@ CREATE USER payslip_user WITH PASSWORD 'password123';
 GRANT ALL PRIVILEGES ON DATABASE payslip TO payslip_user;
 ```
 
+### 2.1. Create .env File
+
+Create a `.env` file in the project root with the following content (example):
+
+```
+JWT_SECRET=super_secret_key_123
+```
+
+You can change the value to any secret string you want.
+
 ### 3. Run Database Migration
 
 Install golang-migrate CLI if you haven't already:
@@ -80,7 +90,7 @@ This will:
 ### 4. Run the Server
 
 ```bash
-go run main.go
+make watch
 ```
 
 Access the server at:
@@ -114,15 +124,41 @@ You can explore and test the available endpoints.
 
 ## 🛠 Example API Usage
 
+### ✅ Register (Admin or Employee)
+
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "full_name": "Admin2",
+  "username": "admin2",
+  "password": "admin2password",
+  "user_role": "admin"
+}
+```
+
+### ✅ Login (Admin or Employee)
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "username": "angieang",
+  "password": "angiepassword"
+}
+```
+> The response will include a Bearer token. Use this token in the `Authorization` header for all authenticated requests:
+
+```
+Authorization: Bearer <your_token_here>
+```
+
 ### ✅ Submit Attendance
 
 ```http
 POST /attendance
-Content-Type: application/json
-
-{
-  "date": "2025-06-21"
-}
 ```
 > Cannot submit on weekends.
 
@@ -133,7 +169,6 @@ POST /overtime
 Content-Type: application/json
 
 {
-  "date": "2025-06-21",
   "hours": 2
 }
 ```
@@ -147,6 +182,7 @@ Content-Type: application/json
 
 {
   "amount": 250000,
+  "date" : "2025-01-20"
   "description": "Travel expense"
 }
 ```
@@ -154,19 +190,19 @@ Content-Type: application/json
 ### ✅ Create Attendance Period (Admin)
 
 ```http
-POST /attendance-period
+POST /admin/attendance-period
 Content-Type: application/json
 
 {
-  "start_date": "2025-06-01",
-  "end_date": "2025-06-30"
+  "start_date": "2025-01-01",
+  "end_date": "2025-01-31"
 }
 ```
 
 ### ✅ Run Payroll (Admin)
 
 ```http
-POST /payroll/run
+POST /admin/payroll/run
 Content-Type: application/json
 
 {
@@ -174,14 +210,23 @@ Content-Type: application/json
 }
 ```
 
+### ✅ Get Attendance Period (Employee)
+```http
+GET /attendance-period?page=1&page_size=10
+```
+
 ### ✅ Generate Payslip (Employee)
 
 ```http
-GET /payslip?attendance_period_id=uuid-attendance-period
+POST /payslip
+Content-Type: application/json
+{
+  "period_id": "0370f6f0-5762-4bbe-a57c-b398c2c76dd2"
+}
 ```
 
 ### ✅ Generate Summary (Admin)
 
 ```http
-GET /payslip/summary?attendance_period_id=uuid-attendance-period
+GET /admin/payslip/summary?attendance_period_id=uuid-attendance-period
 ```

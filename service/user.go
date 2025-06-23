@@ -10,27 +10,23 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type GetUserByUsernameParam struct {
-	Username string `json:"username"`
-}
-
 type GetUserByUsernameResult struct {
 	StatusCode    string      `json:"status_code"`
 	StatusMessage string      `json:"status_msg"`
 	Data          interface{} `json:"data"`
 }
 
-func (service *Service) GetUserByUsername(ctx context.Context, param *GetUserByUsernameParam) (*GetUserByUsernameResult, error) {
+func (service *Service) GetUserByUsername(ctx context.Context, username string) (*GetUserByUsernameResult, error) {
 	const op errs.Op = "service/GetUserByUsername"
 
 	service.logger.WithFields(logrus.Fields{
 		"op":    op,
-		"param": fmt.Sprintf("%+v", param),
+		"param": fmt.Sprintf("%+v", username),
 	}).Debug()
 
 	serviceResult := &GetUserByUsernameResult{}
 
-	storeResult, err := service.store.postgres.GetUserByUsername(ctx, param.Username)
+	storeResult, err := service.store.postgres.GetUserByUsername(ctx, username)
 	if err != nil {
 		// Check if it's a "no rows" error
 		if err.Error() == "sql: no rows in result set" {
