@@ -202,11 +202,11 @@ Content-Type: application/json
 ### ✅ Run Payroll (Admin)
 
 ```http
-POST /admin/payroll/run
+POST /admin/payroll
 Content-Type: application/json
 
 {
-  "attendance_period_id": "uuid-attendance-period"
+  "period_id": "uuid-attendance-period"
 }
 ```
 
@@ -228,7 +228,7 @@ Content-Type: application/json
 ### ✅ Generate Summary (Admin)
 
 ```http
-GET /admin/payslip/summary?attendance_period_id=uuid-attendance-period
+GET /admin/payslip-summary?start_date=2025-01-01&end_date=2025-01-31&page=1&page_size=10
 ```
 
 ## 🗝️ Default Logins
