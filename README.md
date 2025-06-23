@@ -131,10 +131,10 @@ POST /auth/register
 Content-Type: application/json
 
 {
-  "full_name": "Admin2",
-  "username": "admin2",
-  "password": "admin2password",
-  "user_role": "admin"
+  "full_name": "employeexyz",
+  "username": "employeexyz",
+  "password": "employee123",
+  "user_role": "employee"
 }
 ```
 
@@ -145,8 +145,8 @@ POST /auth/login
 Content-Type: application/json
 
 {
-  "username": "angieang",
-  "password": "angiepassword"
+  "username": "employeexyz",
+  "password": "employee123"
 }
 ```
 > The response will include a Bearer token. Use this token in the `Authorization` header for all authenticated requests:
@@ -230,3 +230,12 @@ Content-Type: application/json
 ```http
 GET /admin/payslip/summary?attendance_period_id=uuid-attendance-period
 ```
+
+## 🗝️ Default Logins
+
+- Admin:  
+  - Username: `admin`  
+  - Password: `admin123`
+- Employees:  
+  - Username: `employee_1`, `employee_2`, ..., `employee_100`
+  - Password: `employee123`
