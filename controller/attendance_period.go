@@ -13,8 +13,6 @@ import (
 type CreateAttendancePeriodRequest struct {
 	StartDate string `json:"start_date" example:"2025-01-01"`
 	EndDate   string `json:"end_date" example:"2025-01-31"`
-	CreatedBy string `json:"created_by" example:"5407e21d-bee4-422e-9158-ed705347648b"`
-	UpdatedBy string `json:"updated_by" example:"5407e21d-bee4-422e-9158-ed705347648b"`
 }
 
 // CreateAttendancePeriod godoc
@@ -89,7 +87,7 @@ func (controller *Controller) CreateAttendancePeriod(c *fiber.Ctx) error {
 // @Failure 500 {object} map[string]interface{}
 // @Security BearerAuth
 // @Success 200 {object} map[string]interface{}
-// @Router /admin/attendance_period [get]
+// @Router /attendance_period [get]
 func (controller *Controller) GetAttendancePeriodList(c *fiber.Ctx) error {
 	params := &service.GetAttendancePeriodListParam{}
 

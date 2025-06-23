@@ -15,7 +15,7 @@ type CreateOvertimeRequest struct {
 
 // CreateOvertime godoc
 // @Summary Create a new overtime
-// @Description Only admin can create an overtime by providing user id, hours, ip address and created by
+// @Description Employee can create an overtime
 // @Tags Overtime
 // @Accept json
 // @Produce json

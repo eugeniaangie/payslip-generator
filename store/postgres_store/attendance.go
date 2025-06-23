@@ -78,3 +78,41 @@ func (store *Store) GetAttendanceByUserAndDate(ctx context.Context, userID strin
 
 	return &attendance, nil
 }
+
+type GetAttendanceByUserIDAndPeriodIDParam struct {
+	UserID    string
+	StartDate string
+	EndDate   string
+}
+
+type GetAttendanceByUserIDAndPeriodIDResult struct {
+	Data []model.Attendance
+}
+
+func (store *Store) GetAttendanceByUserIDAndPeriodID(ctx context.Context, param *GetAttendanceByUserIDAndPeriodIDParam) (*GetAttendanceByUserIDAndPeriodIDResult, error) {
+	const op errs.Op = "postgres_store/GetAttendanceByUserIDAndPeriodID"
+
+	query := `
+		SELECT * FROM attendance
+		WHERE user_id = $1 AND date <= $2 AND date >= $3
+	`
+
+	var attendance []model.Attendance
+
+	err := store.Db.SelectContext(ctx, &attendance, query, param.UserID, param.EndDate, param.StartDate)
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "SelectContext",
+			"err":   err.Error(),
+			"query": query,
+		}).Error()
+		return nil, err
+	}
+
+	result := &GetAttendanceByUserIDAndPeriodIDResult{
+		Data: attendance,
+	}
+
+	return result, nil
+}

@@ -58,3 +58,41 @@ func (store *Store) CreateReimbursement(ctx context.Context, param *CreateReimbu
 
 	return result, nil
 }
+
+
+type GetReimbursementByUserIDAndPeriodIDParam struct {
+	UserID    string
+	StartDate string
+	EndDate   string
+}
+
+type GetReimbursementByUserIDAndPeriodIDResult struct {
+	Data []model.Reimbursement
+}
+
+func (store *Store) GetReimbursementByUserIDAndPeriodID(ctx context.Context, param *GetReimbursementByUserIDAndPeriodIDParam) (*GetReimbursementByUserIDAndPeriodIDResult, error) {	
+	const op errs.Op = "postgres_store/GetReimbursementByUserIDAndPeriodID"
+
+	query := `
+		SELECT * FROM reimbursement
+		WHERE user_id = $1 AND date <= $2 AND date >= $3
+	`
+
+	var reimbursement []model.Reimbursement
+
+	err := store.Db.SelectContext(ctx, &reimbursement, query, param.UserID, param.EndDate, param.StartDate)
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "SelectContext",
+			"err":   err.Error(),
+		}).Error()
+		return nil, err
+	}
+
+	result := &GetReimbursementByUserIDAndPeriodIDResult{
+		Data: reimbursement,
+	}
+
+	return result, nil
+}

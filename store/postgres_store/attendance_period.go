@@ -146,3 +146,47 @@ func (store *Store) GetAttendancePeriodList(ctx context.Context, param *GetAtten
 
 	return result, nil
 }
+
+
+type GetAttendancePeriodByIDParam struct {
+	ID string
+}
+
+type GetAttendancePeriodByIDResult struct {
+	Data model.AttendancePeriod
+}
+
+func (store *Store) GetAttendancePeriodByID(ctx context.Context, param *GetAttendancePeriodByIDParam) (*GetAttendancePeriodByIDResult, error) {
+	const op errs.Op = "postgres_store/GetAttendancePeriodByID"
+
+	query := `
+		SELECT 
+		id, 
+		to_char(start_date, 'YYYY-MM-DD') as start_date,
+		to_char(end_date, 'YYYY-MM-DD') as end_date,
+		created_by, 
+		updated_by, 
+		created_at, 
+		updated_at 
+		FROM attendance_period
+		WHERE id = $1
+	`
+
+	var attendancePeriod model.AttendancePeriod
+
+	err := store.Db.GetContext(ctx, &attendancePeriod, query, param.ID)
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "GetContext",
+			"err":   err.Error(),
+		}).Error()
+		return nil, err
+	}
+
+	result := &GetAttendancePeriodByIDResult{
+		Data: attendancePeriod,
+	}
+
+	return result, nil
+}

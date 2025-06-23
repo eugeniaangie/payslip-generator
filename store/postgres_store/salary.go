@@ -54,3 +54,38 @@ func (store *Store) CreateSalary(ctx context.Context, param *CreateSalaryParam) 
 
 	return result, nil
 }
+
+type GetSalaryByUserIDParam struct {
+	UserID string
+}
+
+type GetSalaryByUserIDResult struct {
+	Data model.Salary
+}
+
+func (store *Store) GetSalaryByUserID(ctx context.Context, param *GetSalaryByUserIDParam) (*GetSalaryByUserIDResult, error) {
+	const op errs.Op = "postgres_store/GetSalaryByUserID"
+
+	query := `
+		SELECT * FROM salary
+		WHERE user_id = $1 and is_active = true
+	`
+
+	var salary model.Salary
+
+	err := store.Db.GetContext(ctx, &salary, query, param.UserID)
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "GetContext",
+			"err":   err.Error(),
+		}).Error()
+		return nil, err
+	}
+
+	result := &GetSalaryByUserIDResult{
+		Data: salary,
+	}
+
+	return result, nil
+}

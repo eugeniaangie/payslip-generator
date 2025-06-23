@@ -80,3 +80,40 @@ func (store *Store) GetOvertimeByUserAndDate(ctx context.Context, userID string,
 
 	return &overtime, nil
 }
+
+type GetOvertimeByUserIDAndPeriodIDParam struct {
+	UserID    string
+	StartDate string
+	EndDate   string
+}
+
+type GetOvertimeByUserIDAndPeriodIDResult struct {
+	Data []model.Overtime
+}
+
+func (store *Store) GetOvertimeByUserIDAndPeriodID(ctx context.Context, param *GetOvertimeByUserIDAndPeriodIDParam) (*GetOvertimeByUserIDAndPeriodIDResult, error) {
+	const op errs.Op = "postgres_store/GetOvertimeByUserIDAndPeriodID"
+
+	query := `
+		SELECT * FROM overtime
+		WHERE user_id = $1 AND date <= $2 AND date >= $3
+	`
+
+	var overtime []model.Overtime
+
+	err := store.Db.SelectContext(ctx, &overtime, query, param.UserID, param.EndDate, param.StartDate)
+	if err != nil {
+		store.logger.WithFields(logrus.Fields{
+			"op":    op,
+			"scope": "SelectContext",
+			"err":   err.Error(),
+		}).Error()
+		return nil, err
+	}
+
+	result := &GetOvertimeByUserIDAndPeriodIDResult{
+		Data: overtime,
+	}
+
+	return result, nil
+}

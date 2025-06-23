@@ -10,7 +10,7 @@ import (
 
 // CreateAttendance godoc
 // @Summary Create a new attendance
-// @Description Only admin can create an attendance by providing user id, date, ip address and created by
+// @Description Employee can create an attendance
 // @Tags Attendance
 // @Accept json
 // @Produce json

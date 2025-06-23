@@ -16,87 +16,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/admin/attendance_period": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Get attendance period list",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Attendance Period"
-                ],
-                "summary": "Get attendance period list",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Start date",
-                        "name": "start_date",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "End date",
-                        "name": "end_date",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of attendance periods per page",
-                        "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -164,6 +83,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/salary": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Only admin can create a salary by providing user id, amount, is active, ip address and created by",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Salary"
+                ],
+                "summary": "Create a new salary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Salary request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.CreateSalaryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/attendance": {
             "post": {
                 "security": [
@@ -171,7 +158,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Only admin can create an attendance by providing user id, date, ip address and created by",
+                "description": "Employee can create an attendance",
                 "consumes": [
                     "application/json"
                 ],
@@ -183,6 +170,89 @@ const docTemplate = `{
                 ],
                 "summary": "Create a new attendance",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/attendance_period": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get attendance period list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendance Period"
+                ],
+                "summary": "Get attendance period list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Start date",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date",
+                        "name": "end_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of attendance periods per page",
+                        "name": "page_size",
+                        "in": "query"
+                    },
                     {
                         "type": "string",
                         "description": "Bearer token",
@@ -300,7 +370,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Only admin can create an overtime by providing user id, hours, ip address and created by",
+                "description": "Employee can create an overtime",
                 "consumes": [
                     "application/json"
                 ],
@@ -326,6 +396,74 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/controller.CreateOvertimeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/payslip": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Employee can generate a payslip by providing period id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payslip"
+                ],
+                "summary": "Generate a new payslip",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Payslip Payload",
+                        "name": "payslip",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.CreatePayslipRequest"
                         }
                     }
                 ],
@@ -392,7 +530,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Only admin can create a reimbursement by providing date, amount, description, ip address and created by",
+                "description": "Employee can create a reimbursement",
                 "consumes": [
                     "application/json"
                 ],
@@ -458,10 +596,6 @@ const docTemplate = `{
         "controller.CreateAttendancePeriodRequest": {
             "type": "object",
             "properties": {
-                "created_by": {
-                    "type": "string",
-                    "example": "5407e21d-bee4-422e-9158-ed705347648b"
-                },
                 "end_date": {
                     "type": "string",
                     "example": "2025-01-31"
@@ -469,10 +603,6 @@ const docTemplate = `{
                 "start_date": {
                     "type": "string",
                     "example": "2025-01-01"
-                },
-                "updated_by": {
-                    "type": "string",
-                    "example": "5407e21d-bee4-422e-9158-ed705347648b"
                 }
             }
         },
@@ -482,6 +612,15 @@ const docTemplate = `{
                 "hours": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "controller.CreatePayslipRequest": {
+            "type": "object",
+            "properties": {
+                "period_id": {
+                    "type": "string",
+                    "example": "0370f6f0-5762-4bbe-a57c-b398c2c76dd2"
                 }
             }
         },
@@ -499,6 +638,23 @@ const docTemplate = `{
                 "description": {
                     "type": "string",
                     "example": "Transportation"
+                }
+            }
+        },
+        "controller.CreateSalaryRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 100000
+                },
+                "is_active": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "369e9c16-2df2-4a18-ab83-d6c0065ecfce"
                 }
             }
         },
