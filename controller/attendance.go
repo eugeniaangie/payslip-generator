@@ -38,6 +38,7 @@ func (controller *Controller) CreateAttendance(c *fiber.Ctx) error {
 	params.UserID = userID.(string)
 	params.IpAddress = ipAddress
 	params.CreatedBy = userID.(string)
+	params.UpdatedBy = userID.(string)
 
 	result, err := controller.service.CreateAttendance(context.Background(), params)
 	if err != nil {

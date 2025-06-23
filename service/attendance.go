@@ -14,6 +14,7 @@ type CreateAttendanceParam struct {
 	UserID    string `json:"user_id"`
 	IpAddress string `json:"ip_address"`
 	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
 }
 
 type CreateAttendanceResult struct {
