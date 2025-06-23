@@ -43,7 +43,7 @@ This system allows employees to submit attendance, overtime, and reimbursements,
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/payslip.git
+git clone https://github.com/euegniaangie/payslip.git
 cd payslip
 ```
 
