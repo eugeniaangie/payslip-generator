@@ -30,7 +30,7 @@ func defineEndpoints(app *fiber.App, controller *controller.Controller) *fiber.A
 	apiEmployee.Use(middleware.AuthMiddleware())
 	apiEmployee.Post("/attendance", controller.CreateAttendance)
 	apiEmployee.Post("/overtime", controller.CreateOvertime)
-	// apiEmployee.Post("/reimbursement", controller.CreateReimbursement)
+	apiEmployee.Post("/reimbursement", controller.CreateReimbursement)
 	// apiEmployee.Get("/payslip/:period_id", controller.GetPayslip)
 
 	return app

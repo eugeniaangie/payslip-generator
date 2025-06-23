@@ -373,6 +373,74 @@
                     }
                 }
             }
+        },
+        "/reimbursement": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Only admin can create a reimbursement by providing date, amount, description, ip address and created by",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Reimbursement"
+                ],
+                "summary": "Create a new reimbursement",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Reimbursement request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.CreateReimbursementRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -403,6 +471,23 @@
                 "hours": {
                     "type": "integer",
                     "example": 1
+                }
+            }
+        },
+        "controller.CreateReimbursementRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer",
+                    "example": 100000
+                },
+                "date": {
+                    "type": "string",
+                    "example": "2025-01-01"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "Transportation"
                 }
             }
         },
